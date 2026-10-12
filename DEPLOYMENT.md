@@ -18,7 +18,10 @@ APP_URL=https://domain-toko-anda
 APP_KEY=base64:KEY_UNIK_YANG_DISIMPAN_PERMANEN
 DB_CONNECTION=mysql
 SESSION_SECURE_COOKIE=true
+# Untuk Railway/hosting behind reverse proxy, pastikan APP_URL memakai https dan proxy header diterima.
 ```
+
+Untuk Railway, atur `APP_URL` ke URL publik HTTPS Railway Anda, lalu pastikan `SESSION_SECURE_COOKIE=true` dan `APP_ENV=production`. Aplikasi sudah dikonfigurasi untuk mempercayai header proxy yang dikirim oleh Railway, sehingga URL dan cookie akan dibuat dalam skema HTTPS yang benar.
 
 Isi kredensial database dan `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, serta `DB_PASSWORD` dari panel hosting. Buat `APP_KEY` satu kali pada instalasi pertama dan pertahankan nilainya untuk deploy berikutnya.
 
