@@ -62,6 +62,11 @@
                     <a href="{{ route('new-arrivals') }}" @if (request()->routeIs('new-arrivals')) aria-current="page" @endif>New Arrivals</a>
                 </nav>
                 <div class="tl-store-header__actions">
+                    <form class="tl-store-header__search" action="{{ route('shop') }}" method="GET" role="search">
+                        <input type="search" name="q" value="{{ request('q') }}" placeholder="Cari produk" aria-label="Cari produk">
+                        <button type="submit">Cari</button>
+                    </form>
+                    <a href="{{ route('cart') }}">Keranjang</a>
                     <a href="{{ route('account') }}">Account</a>
                 </div>
             </div>

@@ -24,7 +24,10 @@ class ExampleTest extends TestCase
             ->assertSee('Tampilkan slide 3')
             ->assertSee('Slide berikutnya')
             ->assertSee('data-mobile-menu-toggle', false)
-            ->assertSee('aria-controls="storefront-menu"', false);
+            ->assertSee('aria-controls="storefront-menu"', false)
+            ->assertSee('name="q"', false)
+            ->assertSee('Cari produk')
+            ->assertSee('Keranjang');
     }
 
     public function test_the_shop_catalog_renders_when_no_products_are_available(): void
