@@ -1,0 +1,19 @@
+@extends('admin.layouts.app')
+@section('title', 'Ubah Produk')
+
+@section('content')
+<div class="mt-unit-lg mb-unit-md">
+  <nav class="flex items-center gap-1.5 font-label-sm text-label-sm text-outline">
+    <a href="{{ route('admin.products.index') }}" class="hover:text-primary">Produk</a>
+    <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+    <span class="text-on-surface font-medium">{{ $product->name }}</span>
+  </nav>
+  <h1 class="font-headline-lg text-headline-lg text-primary tracking-tight mt-1">Ubah Produk</h1>
+</div>
+
+<form action="{{ route('admin.products.update', $product) }}" method="POST" enctype="multipart/form-data">
+  @csrf
+  @method('PUT')
+  @include('admin.products._form')
+</form>
+@endsection
