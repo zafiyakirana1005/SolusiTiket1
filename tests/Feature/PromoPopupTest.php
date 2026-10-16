@@ -29,11 +29,12 @@ class PromoPopupTest extends TestCase
 
         $this->get(route('home'))
             ->assertOk()
-            ->assertSee('data-promo-popup="' . $popupPromo->id . '"', false)
+            ->assertSee('data-promo-popup="'.$popupPromo->id.'"', false)
+            ->assertSee('data-slide-toggle', false)
             ->assertSee("const promoPopup = document.querySelector('[data-promo-popup]')", false)
             ->assertDontSee('merchtlm:closed-promo-popup')
-            ->assertDontSee('data-promo-popup="' . $nonPopupPromo->id . '"', false)
-            ->assertDontSee('data-promo-popup="' . $inactivePromo->id . '"', false);
+            ->assertDontSee('data-promo-popup="'.$nonPopupPromo->id.'"', false)
+            ->assertDontSee('data-promo-popup="'.$inactivePromo->id.'"', false);
     }
 
     public function test_admin_can_create_a_promo_enabled_for_homepage_popup(): void

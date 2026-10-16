@@ -212,6 +212,7 @@
                         <button class="tl-slider__dot" type="button" data-slide-index="{{ $loop->index }}" aria-label="Tampilkan slide {{ $loop->iteration }}" aria-pressed="{{ $loop->first ? 'true' : 'false' }}"></button>
                     @endforeach
                 </div>
+                <button class="tl-slider__toggle" type="button" data-slide-toggle aria-pressed="false" aria-label="Jeda slide otomatis">Jeda</button>
                 <button class="tl-slider__arrow" type="button" data-slide-next aria-label="Slide berikutnya">&#8594;</button>
             </div>
         </section>
