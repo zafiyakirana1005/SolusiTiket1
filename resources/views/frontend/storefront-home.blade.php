@@ -429,17 +429,13 @@
             });
         });
 
-        const promoPopups = Array.from(document.querySelectorAll('[data-promo-popup]'));
-        const nextPromoPopup = promoPopups.find((popup) => (
-            window.localStorage.getItem(`merchtlm:closed-promo-popup:${popup.dataset.promoPopup}`) !== '1'
-        ));
+        const promoPopup = document.querySelector('[data-promo-popup]');
 
-        if (nextPromoPopup) {
-            nextPromoPopup.hidden = false;
-            nextPromoPopup.querySelector('[data-close-promo-popup]').focus();
-            nextPromoPopup.querySelector('[data-close-promo-popup]').addEventListener('click', () => {
-                nextPromoPopup.hidden = true;
-                window.localStorage.setItem(`merchtlm:closed-promo-popup:${nextPromoPopup.dataset.promoPopup}`, '1');
+        if (promoPopup) {
+            promoPopup.hidden = false;
+            promoPopup.querySelector('[data-close-promo-popup]').focus();
+            promoPopup.querySelector('[data-close-promo-popup]').addEventListener('click', () => {
+                promoPopup.hidden = true;
             });
         }
     </script>
