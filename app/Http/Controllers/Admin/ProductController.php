@@ -77,6 +77,7 @@ class ProductController extends Controller
             'image_path_back'=> $this->uploadImage($request, 'image_back'),
         ]);
 
+        $this->storeGalleryImages($request, $product);
         $this->syncVariants($request, $product);
 
         return redirect()->route('admin.products.index')
@@ -86,13 +87,22 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $categories = Category::orderBy('name')->get();
-        $product->load('variants');
+        $product->load(['variants', 'images']);
         return view('admin.products.edit', compact('product', 'categories'));
     }
 
     public function update(Request $request, Product $product)
     {
         $data = $this->validateData($request, $product->id);
+
+        $imagesToRemove = $product->images()
+            ->whereIn('id', $request->input('remove_images', []))
+            ->get();
+
+        foreach ($imagesToRemove as $image) {
+            Storage::disk('public')->delete($image->image_path);
+            $image->delete();
+        }
 
         $imagePath     = $product->image_path;
         $imagePathBack = $product->image_path_back;
@@ -122,6 +132,7 @@ class ProductController extends Controller
             'image_path_back'=> $imagePathBack,
         ]);
 
+        $this->storeGalleryImages($request, $product);
         $this->syncVariants($request, $product);
 
         return redirect()->route('admin.products.index')
@@ -132,6 +143,9 @@ class ProductController extends Controller
     {
         if ($product->image_path)      Storage::disk('public')->delete($product->image_path);
         if ($product->image_path_back) Storage::disk('public')->delete($product->image_path_back);
+        foreach ($product->images as $image) {
+            Storage::disk('public')->delete($image->image_path);
+        }
         $product->delete();
         return back()->with('success', 'Produk berhasil dihapus.');
     }
@@ -148,6 +162,18 @@ class ProductController extends Controller
     {
         if (!$request->hasFile($field)) return null;
         return $request->file($field)->store('products', 'public');
+    }
+
+    private function storeGalleryImages(Request $request, Product $product): void
+    {
+        $nextOrder = (int) $product->images()->max('sort_order') + 1;
+
+        foreach ($request->file('gallery_images', []) as $index => $image) {
+            $product->images()->create([
+                'image_path' => $image->store('products/gallery', 'public'),
+                'sort_order' => $nextOrder + $index,
+            ]);
+        }
     }
 
     private function validateData(Request $request, ?int $ignoreId = null): array
@@ -167,6 +193,10 @@ class ProductController extends Controller
             'status'       => 'required|in:active,draft,out_of_stock,archived',
             'image'        => 'nullable|image|max:2048',
             'image_back'   => 'nullable|image|max:2048',
+            'gallery_images' => 'sometimes|array|max:8',
+            'gallery_images.*' => 'image|max:4096',
+            'remove_images' => 'sometimes|array',
+            'remove_images.*' => 'integer',
         ], [
             'sku.unique' => 'SKU sudah ada. Gunakan SKU lain.',
         ]);

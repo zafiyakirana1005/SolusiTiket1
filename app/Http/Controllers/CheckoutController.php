@@ -40,11 +40,21 @@ class CheckoutController extends Controller
 
         if ($promoCode) {
             $promo = Promo::where('code', $promoCode)->first();
-            if ($promo) {
-                $result = $promo->calculateDiscount($subtotal);
-                $discount = $result['discount'];
-                $activePromo = $promo;
+            if (!$promo) {
+                session()->forget('promo_code');
+
+                return redirect()->route('cart')->with('promo_error', 'Kode promo tidak ditemukan atau sudah tidak tersedia.');
             }
+
+            $result = $promo->calculateDiscount($subtotal);
+            if (!$result['eligible']) {
+                session()->forget('promo_code');
+
+                return redirect()->route('cart')->with('promo_error', $result['reason']);
+            }
+
+            $discount = $result['discount'];
+            $activePromo = $promo;
         }
 
         $shippingCost = 15000; // default — bisa dibuat dinamis berdasarkan kota
@@ -135,13 +145,23 @@ class CheckoutController extends Controller
             $promoUsed = null;
             if ($promoCode = session('promo_code')) {
                 $promo = Promo::query()->where('code', $promoCode)->lockForUpdate()->first();
-                if ($promo) {
-                    $result = $promo->calculateDiscount($subtotal);
-                    if ($result['eligible']) {
-                        $discount = $result['discount'];
-                        $promoUsed = $promo;
-                    }
+                if (!$promo) {
+                    session()->forget('promo_code');
+
+                    throw ValidationException::withMessages([
+                        'promo' => 'Kode promo tidak ditemukan atau sudah tidak tersedia. Masukkan kode promo yang valid kembali.',
+                    ]);
                 }
+
+                $result = $promo->calculateDiscount($subtotal);
+                if (!$result['eligible']) {
+                    session()->forget('promo_code');
+
+                    throw ValidationException::withMessages(['promo' => $result['reason']]);
+                }
+
+                $discount = $result['discount'];
+                $promoUsed = $promo;
             }
 
             $shippingCost = 15000;

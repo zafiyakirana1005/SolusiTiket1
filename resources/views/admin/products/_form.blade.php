@@ -120,6 +120,41 @@
              class="mt-1 w-full text-body-sm text-on-surface-variant file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-surface-container file:text-on-surface file:text-sm">
     </div>
 
+    <div class="md:col-span-2 rounded-xl border border-surface-container p-unit-md">
+      <div class="flex flex-wrap items-center justify-between gap-unit-sm">
+        <div>
+          <h3 class="font-label-md text-label-md font-semibold text-on-surface">Foto tambahan untuk detail produk</h3>
+          <p class="mt-1 font-body-sm text-body-sm text-on-surface-variant">Tambahkan foto satu per satu. Foto depan dan belakang tetap dipakai untuk gambar utama dan efek hover.</p>
+        </div>
+        <button type="button" data-add-gallery-image
+                class="px-3 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container font-label-sm text-label-sm font-semibold flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">add</span> Tambah Foto
+        </button>
+      </div>
+      @if (isset($product) && $product->images->isNotEmpty())
+        <div class="mt-unit-sm grid grid-cols-2 sm:grid-cols-4 gap-unit-sm">
+          @foreach ($product->images as $image)
+            <label class="relative cursor-pointer rounded-lg border border-surface-container p-1.5">
+              <img src="{{ asset('storage/' . $image->image_path) }}" class="aspect-square w-full rounded-md object-cover" alt="Foto tambahan {{ $loop->iteration }}">
+              <span class="mt-1 flex items-center gap-1 text-xs text-error">
+                <input type="checkbox" name="remove_images[]" value="{{ $image->id }}">
+                Hapus foto {{ $loop->iteration }}
+              </span>
+            </label>
+          @endforeach
+        </div>
+      @endif
+      <div class="mt-unit-sm space-y-2" data-gallery-image-inputs aria-live="polite"></div>
+      <p class="mt-1 font-label-sm text-label-sm text-outline" data-gallery-image-limit hidden>Maksimal 8 foto tambahan dalam satu kali penyimpanan.</p>
+      @foreach ($errors->messages() as $field => $messages)
+        @if ($field === 'gallery_images' || str_starts_with($field, 'gallery_images.'))
+          @foreach ($messages as $message)
+            <p class="mt-1 font-label-sm text-label-sm text-error" role="alert">{{ $message }}</p>
+          @endforeach
+        @endif
+      @endforeach
+    </div>
+
   </div>
 
   {{-- ── Varian ───────────────────────────────────────────── --}}
@@ -132,6 +167,68 @@
         <span class="material-symbols-outlined text-[16px]">add</span> Tambah Varian
       </button>
     </div>
+
+    <script>
+        const galleryImageInputs = document.querySelector('[data-gallery-image-inputs]');
+        const addGalleryImageButton = document.querySelector('[data-add-gallery-image]');
+        const galleryImageLimit = document.querySelector('[data-gallery-image-limit]');
+        const maxGalleryImageInputs = 8;
+
+        if (galleryImageInputs && addGalleryImageButton) {
+            const updateGalleryImageLimit = () => {
+                const isAtLimit = galleryImageInputs.children.length >= maxGalleryImageInputs;
+                addGalleryImageButton.disabled = isAtLimit;
+                galleryImageLimit.hidden = !isAtLimit;
+            };
+
+            addGalleryImageButton.addEventListener('click', () => {
+                if (galleryImageInputs.children.length >= maxGalleryImageInputs) return;
+
+                const row = document.createElement('div');
+                row.className = 'flex flex-wrap items-center gap-2 rounded-lg bg-surface-container-low p-2';
+
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.name = 'gallery_images[]';
+                input.accept = 'image/*';
+                input.className = 'min-w-0 flex-1 text-body-sm text-on-surface-variant file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-surface-container file:text-on-surface file:text-sm';
+
+                const preview = document.createElement('img');
+                preview.alt = 'Pratinjau foto produk';
+                preview.className = 'hidden h-12 w-12 rounded-md border border-surface-container object-cover';
+
+                const removeButton = document.createElement('button');
+                removeButton.type = 'button';
+                removeButton.className = 'flex h-9 items-center gap-1 rounded-lg px-2 text-error hover:bg-error-container/40';
+                removeButton.setAttribute('aria-label', 'Hapus baris foto');
+                removeButton.innerHTML = '<span class="material-symbols-outlined text-[18px]">delete</span> Hapus';
+
+                input.addEventListener('change', () => {
+                    const file = input.files[0];
+                    if (!file || !file.type.startsWith('image/')) {
+                        preview.classList.add('hidden');
+                        preview.removeAttribute('src');
+                        return;
+                    }
+
+                    if (preview.dataset.objectUrl) URL.revokeObjectURL(preview.dataset.objectUrl);
+                    preview.dataset.objectUrl = URL.createObjectURL(file);
+                    preview.src = preview.dataset.objectUrl;
+                    preview.classList.remove('hidden');
+                });
+
+                removeButton.addEventListener('click', () => {
+                    if (preview.dataset.objectUrl) URL.revokeObjectURL(preview.dataset.objectUrl);
+                    row.remove();
+                    updateGalleryImageLimit();
+                });
+
+                row.append(input, preview, removeButton);
+                galleryImageInputs.append(row);
+                updateGalleryImageLimit();
+            });
+        }
+    </script>
     @error('variant_sku')
       <p class="mb-unit-sm font-label-sm text-label-sm text-error" role="alert">{{ $message }}</p>
     @enderror

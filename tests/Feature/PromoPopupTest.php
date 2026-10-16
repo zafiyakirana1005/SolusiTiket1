@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\Promo;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class PromoPopupTest extends TestCase
@@ -31,6 +33,9 @@ class PromoPopupTest extends TestCase
             ->assertOk()
             ->assertSee('data-promo-popup="'.$popupPromo->id.'"', false)
             ->assertSee('data-slide-toggle', false)
+            ->assertSee("window.sessionStorage.getItem('merchtlm:home-popup-shown')", false)
+            ->assertSee("popupNavigation?.type === 'reload'", false)
+            ->assertSee("window.sessionStorage.setItem('merchtlm:home-popup-shown', '1')", false)
             ->assertSee("const promoPopup = document.querySelector('[data-promo-popup]')", false)
             ->assertDontSee('merchtlm:closed-promo-popup')
             ->assertDontSee('data-promo-popup="'.$nonPopupPromo->id.'"', false)
@@ -72,6 +77,35 @@ class PromoPopupTest extends TestCase
             ->assertSee('Promo Beranda')
             ->assertSee('Popup Beranda')
             ->assertSee('Ya');
+    }
+
+    public function test_admin_can_upload_a_promo_popup_image(): void
+    {
+        Storage::fake('public');
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($admin)
+            ->post(route('admin.promos.store'), [
+                'name' => 'Promo dengan Foto',
+                'code' => 'FOTO15',
+                'type' => 'percentage',
+                'value' => 15,
+                'starts_at' => now()->subDay()->format('Y-m-d H:i:s'),
+                'ends_at' => now()->addWeek()->format('Y-m-d H:i:s'),
+                'status' => 'active',
+                'popup_enabled' => '1',
+                'image' => UploadedFile::fake()->image('promo.jpg'),
+            ])
+            ->assertRedirect(route('admin.promos.index'));
+
+        $promo = Promo::where('name', 'Promo dengan Foto')->firstOrFail();
+        $this->assertNotNull($promo->image_path);
+        Storage::disk('public')->assertExists($promo->image_path);
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee(asset('storage/'.$promo->image_path), false)
+            ->assertSee('data-copy-code="', false);
     }
 
     private function createPromo(array $attributes = []): Promo

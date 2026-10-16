@@ -11,7 +11,7 @@
   <h1 class="font-headline-lg text-headline-lg text-primary tracking-tight mt-1">Buat Promo / Campaign Baru</h1>
 </div>
 
-<form action="{{ route('admin.promos.store') }}" method="POST">
+<form action="{{ route('admin.promos.store') }}" method="POST" enctype="multipart/form-data">
   @csrf
   @include('admin.promos._form')
 </form>

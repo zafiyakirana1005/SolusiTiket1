@@ -30,6 +30,14 @@
             ]);
         }
 
+        foreach ($product->images as $index => $image) {
+            $productImages->push([
+                'src' => asset('storage/' . $image->image_path),
+                'alt' => $product->name . ' foto tambahan ' . ($index + 1),
+                'label' => 'Foto tambahan ' . ($index + 1),
+            ]);
+        }
+
         if ($productImages->isEmpty()) {
             $productImages->push([
                 'src' => asset('assets/img/shop/product/product-1.jpg'),

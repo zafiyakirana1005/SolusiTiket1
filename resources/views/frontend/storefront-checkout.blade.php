@@ -43,6 +43,7 @@
             <nav class="checkout-breadcrumb" aria-label="Breadcrumb"><a href="{{ route('home') }}">Beranda</a> / <a href="{{ route('cart') }}">Keranjang</a> / Checkout</nav>
             <h1 class="checkout-title">Detail pengiriman</h1>
             @if ($errors->has('cart'))<p class="checkout-error" role="alert">{{ $errors->first('cart') }}</p>@endif
+            @if ($errors->has('promo'))<p class="checkout-error" role="alert">{{ $errors->first('promo') }}</p>@endif
             <form action="{{ route('checkout.store') }}" method="POST">
                 @csrf
                 <div class="checkout-grid">

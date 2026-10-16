@@ -89,13 +89,16 @@
         .tl-promo-popup { align-items: center; background: rgba(15, 30, 21, .68); display: flex; inset: 0; justify-content: center; padding: 20px; position: fixed; z-index: 1000; }
         .tl-promo-popup[hidden] { display: none; }
         .tl-promo-popup__card { background: var(--white); border: 1px solid var(--line); box-shadow: 0 20px 70px rgba(0, 0, 0, .28); max-width: 480px; padding: 42px 34px 34px; position: relative; text-align: center; width: 100%; }
+        .tl-promo-popup__image { display: block; height: 190px; margin: -42px -34px 28px; object-fit: cover; width: calc(100% + 68px); }
         .tl-promo-popup__close { align-items: center; background: transparent; border: 0; color: var(--ink); cursor: pointer; display: flex; font: 400 28px/1 var(--sans); height: 40px; justify-content: center; padding: 0; position: absolute; right: 12px; top: 10px; width: 40px; }
         .tl-promo-popup__close:hover { color: var(--rust); }
         .tl-promo-popup__eyebrow { color: var(--rust); font-size: 12px; font-weight: 700; letter-spacing: 1.5px; margin: 0 0 12px; text-transform: uppercase; }
         .tl-promo-popup h2 { font: 400 34px/1.12 var(--serif); margin: 0 0 14px; }
         .tl-promo-popup__description { color: var(--muted); line-height: 1.6; margin: 0 auto 16px; }
         .tl-promo-popup__value { color: var(--rust); font-size: 20px; font-weight: 700; margin: 0 0 18px; }
-        .tl-promo-popup__code { border: 1px dashed #b5b7aa; display: inline-block; font-size: 14px; font-weight: 700; letter-spacing: 1px; padding: 9px 14px; }
+        .tl-promo-popup__code { align-items: center; border: 1px dashed #b5b7aa; display: inline-flex; font-size: 14px; font-weight: 700; gap: 12px; letter-spacing: 1px; padding: 8px 10px 8px 14px; }
+        .tl-promo-popup__copy { background: var(--ink); border: 0; color: var(--white); cursor: pointer; font: 700 11px var(--sans); letter-spacing: 0; padding: 8px 10px; }
+        .tl-promo-popup__copy:hover { background: #3c5d49; }
         @media (max-width: 1200px) {
             .tl-products { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         }
@@ -130,6 +133,7 @@
             .tl-feature__inner { align-items: start; flex-direction: column; }
             .tl-feature h2 { font-size: 28px; }
             .tl-promo-popup__card { padding: 42px 22px 26px; }
+            .tl-promo-popup__image { height: 160px; margin: -42px -22px 24px; width: calc(100% + 44px); }
             .tl-promo-popup h2 { font-size: 29px; }
         }
         @media (prefers-reduced-motion: reduce) {
@@ -143,6 +147,9 @@
         <section class="tl-promo-popup" data-promo-popup="{{ $popupPromo->id }}" hidden role="dialog" aria-modal="true" aria-labelledby="promo-popup-title-{{ $popupPromo->id }}">
             <div class="tl-promo-popup__card">
                 <button class="tl-promo-popup__close" type="button" data-close-promo-popup aria-label="Tutup popup promo">&times;</button>
+                @if ($popupPromo->image_path)
+                    <img class="tl-promo-popup__image" src="{{ asset('storage/' . $popupPromo->image_path) }}" alt="Foto promo {{ $popupPromo->name }}">
+                @endif
                 <p class="tl-promo-popup__eyebrow">Promo spesial</p>
                 <h2 id="promo-popup-title-{{ $popupPromo->id }}">{{ $popupPromo->name }}</h2>
                 @if ($popupPromo->description)
@@ -150,7 +157,10 @@
                 @endif
                 <p class="tl-promo-popup__value">Hemat {{ $popupPromo->formattedValue() }}</p>
                 @if ($popupPromo->code)
-                    <p class="tl-promo-popup__code">{{ $popupPromo->code }}</p>
+                    <p class="tl-promo-popup__code">
+                        <span>{{ $popupPromo->code }}</span>
+                        <button class="tl-promo-popup__copy" type="button" data-copy-code="{{ $popupPromo->code }}">Salin kode</button>
+                    </p>
                 @endif
             </div>
         </section>
@@ -431,12 +441,29 @@
         });
 
         const promoPopup = document.querySelector('[data-promo-popup]');
+        const popupNavigation = performance.getEntriesByType('navigation')[0];
+        const isPageRefresh = popupNavigation?.type === 'reload';
+        const hasShownPopupThisTab = window.sessionStorage.getItem('merchtlm:home-popup-shown') === '1';
 
-        if (promoPopup) {
-            promoPopup.hidden = false;
-            promoPopup.querySelector('[data-close-promo-popup]').focus();
-            promoPopup.querySelector('[data-close-promo-popup]').addEventListener('click', () => {
+        if (promoPopup && (isPageRefresh || !hasShownPopupThisTab)) {
+            const closeButton = promoPopup.querySelector('[data-close-promo-popup]');
+            const previousFocus = document.activeElement;
+            const closePromoPopup = () => {
                 promoPopup.hidden = true;
+                document.body.style.overflow = '';
+                previousFocus?.focus();
+            };
+
+            promoPopup.hidden = false;
+            window.sessionStorage.setItem('merchtlm:home-popup-shown', '1');
+            document.body.style.overflow = 'hidden';
+            closeButton.focus();
+            closeButton.addEventListener('click', closePromoPopup);
+            promoPopup.addEventListener('click', (event) => {
+                if (event.target === promoPopup) closePromoPopup();
+            });
+            promoPopup.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') closePromoPopup();
             });
         }
     </script>

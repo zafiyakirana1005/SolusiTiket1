@@ -85,11 +85,20 @@ class CartController extends Controller
 
         if ($promoCode) {
             $promo = Promo::where('code', $promoCode)->first();
-            if ($promo) {
+            if (!$promo) {
+                session()->forget('promo_code');
+                $promoMessage = 'Kode promo tidak ditemukan atau sudah tidak tersedia.';
+                $promoCode = null;
+            } else {
                 $result = $promo->calculateDiscount($subtotal);
-                $discount = $result['discount'];
-                $promoMessage = $result['eligible'] ? null : $result['reason'];
-                $activePromo = $promo;
+                if ($result['eligible']) {
+                    $discount = $result['discount'];
+                    $activePromo = $promo;
+                } else {
+                    session()->forget('promo_code');
+                    $promoMessage = $result['reason'];
+                    $promoCode = null;
+                }
             }
         }
 

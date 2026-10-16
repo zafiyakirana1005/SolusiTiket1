@@ -67,16 +67,47 @@
       <textarea name="description" rows="3" class="mt-1 w-full px-unit-sm py-2 bg-surface-container-low rounded-lg" placeholder="Syarat & ketentuan singkat, target pelanggan, dsb.">{{ old('description', $promo->description ?? '') }}</textarea>
     </div>
 
+    <div class="md:col-span-2 rounded-xl border border-surface-container p-unit-md">
+      <label class="font-label-md text-label-md font-semibold text-on-surface" for="promo-image">Foto popup promo (opsional)</label>
+      <p class="mt-1 font-body-sm text-body-sm text-on-surface-variant">Pilih foto JPG, PNG, atau WebP maksimal 4 MB. Foto akan tampil di bagian atas popup.</p>
+      @if (isset($promo) && $promo->image_path)
+        <img src="{{ asset('storage/' . $promo->image_path) }}" class="mt-unit-sm h-28 w-full max-w-sm rounded-lg object-cover" alt="Foto popup {{ $promo->name }}">
+        <p class="mt-1 font-label-sm text-label-sm text-outline">Upload foto baru untuk mengganti.</p>
+      @endif
+      <input id="promo-image" type="file" name="image" accept="image/*" data-promo-image-input
+             class="mt-unit-sm w-full text-body-sm text-on-surface-variant file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-surface-container file:text-on-surface file:text-sm">
+      <img data-promo-image-preview alt="Pratinjau foto popup" class="mt-unit-sm hidden h-40 w-full max-w-sm rounded-lg object-cover">
+      @error('image')
+        <p class="mt-1 font-label-sm text-label-sm text-error" role="alert">{{ $message }}</p>
+      @enderror
+    </div>
+
     <div class="md:col-span-2">
       <label class="flex items-start gap-2 font-label-md text-label-md text-on-surface-variant">
         <input type="hidden" name="popup_enabled" value="0">
         <input type="checkbox" name="popup_enabled" value="1" @checked(old('popup_enabled', isset($promo) ? $promo->popup_enabled : true)) class="mt-0.5">
         <span>
           <span class="block font-semibold text-on-surface">Tampilkan sebagai popup di halaman awal</span>
-          <span class="block font-body-sm text-body-sm text-outline">Popup promo aktif akan tampil satu kali untuk setiap pengunjung. Pengunjung dapat menutupnya dengan tombol X.</span>
+          <span class="block font-body-sm text-body-sm text-outline">Popup muncul setiap halaman awal dibuka atau di-refresh. Pengunjung dapat menutupnya dengan tombol X.</span>
         </span>
       </label>
     </div>
+
+    <script>
+        document.querySelector('[data-promo-image-input]')?.addEventListener('change', (event) => {
+            const preview = document.querySelector('[data-promo-image-preview]');
+            const file = event.target.files[0];
+
+            if (!file || !file.type.startsWith('image/')) {
+                preview.classList.add('hidden');
+                preview.removeAttribute('src');
+                return;
+            }
+
+            preview.src = URL.createObjectURL(file);
+            preview.classList.remove('hidden');
+        });
+    </script>
   </div>
 
   <div class="mt-unit-lg flex items-center gap-unit-sm">

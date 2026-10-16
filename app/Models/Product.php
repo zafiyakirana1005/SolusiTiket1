@@ -36,6 +36,11 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class);
     }
 
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class)->orderBy('sort_order')->orderBy('id');
+    }
+
     public function totalStock(): int
     {
         return $this->variants->count() ? (int) $this->variants->sum('stock') : $this->stock;

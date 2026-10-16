@@ -11,7 +11,7 @@
   <h1 class="font-headline-lg text-headline-lg text-primary tracking-tight mt-1">Ubah Promo</h1>
 </div>
 
-<form action="{{ route('admin.promos.update', $promo) }}" method="POST">
+<form action="{{ route('admin.promos.update', $promo) }}" method="POST" enctype="multipart/form-data">
   @csrf
   @method('PUT')
   @include('admin.promos._form')

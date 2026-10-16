@@ -107,7 +107,7 @@ class ShopController extends Controller
     public function show(Product $product)
     {
         abort_unless($product->status === 'active', 404);
-        $product->load('variants', 'category');
+        $product->load('variants', 'category', 'images');
 
         $related = Product::where('status', 'active')
             ->where('category_id', $product->category_id)

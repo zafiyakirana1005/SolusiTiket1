@@ -78,10 +78,11 @@
             @if (session('success'))<p class="cart-feedback cart-feedback--success" role="status">{{ session('success') }}</p>@endif
             @if (session('error'))<p class="cart-feedback cart-feedback--error" role="alert">{{ session('error') }}</p>@endif
             @if ($errors->any())<p class="cart-feedback cart-feedback--error" role="alert">{{ $errors->first() }}</p>@endif
-            @if (session('promo_success'))<p class="cart-feedback cart-feedback--success" role="status">{{ session('promo_success') }}</p>@endif
-            @if (session('promo_error'))<p class="cart-feedback cart-feedback--error" role="alert">{{ session('promo_error') }}</p>@endif
             @if ($items->isEmpty())
                 <section class="cart-empty">
+                    @if (session('promo_success'))<p class="cart-feedback cart-feedback--success" role="status">{{ session('promo_success') }}</p>@endif
+                    @if (session('promo_error'))<p class="cart-feedback cart-feedback--error" role="alert">{{ session('promo_error') }}</p>@endif
+                    @if (!empty($promoMessage))<p class="cart-feedback cart-feedback--error" role="alert">{{ $promoMessage }}</p>@endif
                     <h2>Keranjangmu masih kosong</h2>
                     <p class="cart-muted">Jelajahi koleksi merchandise dan pilih yang kamu suka.</p>
                     <a class="cart-button cart-button--compact" href="{{ route('shop') }}">Mulai belanja</a>
@@ -134,6 +135,9 @@
                         @if ($discount > 0)<div class="cart-summary__line cart-discount"><span>Diskon</span><strong>- Rp {{ number_format($discount, 0, ',', '.') }}</strong></div>@endif
                         <p class="cart-total"><span>Total</span><span>Rp {{ number_format($total, 0, ',', '.') }}</span></p>
                         <a class="cart-button" href="{{ route('checkout') }}">Lanjut ke checkout</a>
+                        @if (session('promo_success'))<p class="cart-feedback cart-feedback--success" role="status">{{ session('promo_success') }}</p>@endif
+                        @if (session('promo_error'))<p class="cart-feedback cart-feedback--error" role="alert">{{ session('promo_error') }}</p>@endif
+                        @if (!empty($promoMessage))<p class="cart-feedback cart-feedback--error" role="alert">{{ $promoMessage }}</p>@endif
                     </aside>
                 </div>
             @endif

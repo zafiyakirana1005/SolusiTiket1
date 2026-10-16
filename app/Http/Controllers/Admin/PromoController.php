@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Promo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PromoController extends Controller
 {
@@ -39,6 +40,7 @@ class PromoController extends Controller
     {
         $data = $this->validateData($request);
 
+        $data['image_path'] = $this->storeImage($request);
         Promo::create($data);
 
         return redirect()->route('admin.promos.index')->with('success', 'Promo/campaign baru berhasil dibuat.');
@@ -53,6 +55,13 @@ class PromoController extends Controller
     {
         $data = $this->validateData($request, $promo->id);
 
+        if ($request->hasFile('image')) {
+            if ($promo->image_path) {
+                Storage::disk('public')->delete($promo->image_path);
+            }
+            $data['image_path'] = $this->storeImage($request);
+        }
+
         $promo->update($data);
 
         return redirect()->route('admin.promos.index')->with('success', 'Promo berhasil diperbarui.');
@@ -60,6 +69,9 @@ class PromoController extends Controller
 
     public function destroy(Promo $promo)
     {
+        if ($promo->image_path) {
+            Storage::disk('public')->delete($promo->image_path);
+        }
         $promo->delete();
 
         return back()->with('success', 'Promo berhasil dihapus.');
@@ -89,6 +101,12 @@ class PromoController extends Controller
             'ends_at' => 'required|date|after_or_equal:starts_at',
             'status' => 'required|in:active,inactive',
             'popup_enabled' => 'required|boolean',
+            'image' => 'nullable|image|max:4096',
         ]);
+    }
+
+    private function storeImage(Request $request): ?string
+    {
+        return $request->file('image')?->store('promos', 'public');
     }
 }
