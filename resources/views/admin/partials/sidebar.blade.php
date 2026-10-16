@@ -54,8 +54,8 @@
     <nav class="flex flex-col gap-unit-2xs mb-unit-md">
       <a href="{{ route('admin.promos.index') }}" class="flex items-center justify-between px-unit-sm py-unit-xs rounded-lg transition-colors {{ $nav==='promos' ? 'bg-primary-container text-on-primary font-bold' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface' }}">
         <div class="flex items-center gap-unit-sm min-w-0">
-          <span class="material-symbols-outlined text-[20px]">local_offer</span>
-          <span class="font-label-lg text-label-lg truncate">Promo</span>
+          <span class="material-symbols-outlined text-[20px]">campaign</span>
+          <span class="font-label-lg text-label-lg truncate">Promo &amp; Popup</span>
         </div>
         @php $activePromoCount = \App\Models\Promo::where('status','active')->count(); @endphp
         @if ($activePromoCount)

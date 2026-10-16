@@ -4,7 +4,7 @@
 @section('content')
 <div class="mt-unit-lg mb-unit-md">
   <nav class="flex items-center gap-1.5 font-label-sm text-label-sm text-outline">
-    <a href="{{ route('admin.promos.index') }}" class="hover:text-primary">Promo &amp; Campaign</a>
+    <a href="{{ route('admin.promos.index') }}" class="hover:text-primary">Promo &amp; Popup</a>
     <span class="material-symbols-outlined text-[14px]">chevron_right</span>
     <span class="text-on-surface font-medium">Buat Baru</span>
   </nav>

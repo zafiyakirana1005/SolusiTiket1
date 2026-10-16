@@ -13,12 +13,13 @@ class Promo extends Model
 
     protected $fillable = [
         'name', 'code', 'description', 'type', 'value', 'max_discount',
-        'min_purchase', 'quota', 'used_count', 'starts_at', 'ends_at', 'status',
+        'min_purchase', 'quota', 'used_count', 'starts_at', 'ends_at', 'status', 'popup_enabled',
     ];
 
     protected $casts = [
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
+        'popup_enabled' => 'boolean',
     ];
 
     /**

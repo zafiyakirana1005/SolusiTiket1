@@ -66,6 +66,17 @@
       <label class="font-label-md text-label-md text-on-surface-variant">Deskripsi (opsional)</label>
       <textarea name="description" rows="3" class="mt-1 w-full px-unit-sm py-2 bg-surface-container-low rounded-lg" placeholder="Syarat & ketentuan singkat, target pelanggan, dsb.">{{ old('description', $promo->description ?? '') }}</textarea>
     </div>
+
+    <div class="md:col-span-2">
+      <label class="flex items-start gap-2 font-label-md text-label-md text-on-surface-variant">
+        <input type="hidden" name="popup_enabled" value="0">
+        <input type="checkbox" name="popup_enabled" value="1" @checked(old('popup_enabled', isset($promo) ? $promo->popup_enabled : true)) class="mt-0.5">
+        <span>
+          <span class="block font-semibold text-on-surface">Tampilkan sebagai popup di halaman awal</span>
+          <span class="block font-body-sm text-body-sm text-outline">Popup promo aktif akan tampil satu kali untuk setiap pengunjung. Pengunjung dapat menutupnya dengan tombol X.</span>
+        </span>
+      </label>
+    </div>
   </div>
 
   <div class="mt-unit-lg flex items-center gap-unit-sm">

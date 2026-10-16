@@ -88,6 +88,7 @@ class PromoController extends Controller
             'starts_at' => 'required|date',
             'ends_at' => 'required|date|after_or_equal:starts_at',
             'status' => 'required|in:active,inactive',
+            'popup_enabled' => 'required|boolean',
         ]);
     }
 }

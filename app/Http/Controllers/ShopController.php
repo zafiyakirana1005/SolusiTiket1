@@ -29,7 +29,17 @@ class ShopController extends Controller
             ->take(3)
             ->get();
 
-        return view('frontend.storefront-home', compact('newProducts', 'saleProducts', 'activePromos'));
+        $popupPromos = Promo::where('popup_enabled', true)
+            ->where('status', 'active')
+            ->where('starts_at', '<=', now())
+            ->where('ends_at', '>=', now())
+            ->where(function ($query) {
+                $query->whereNull('quota')->orWhereColumn('used_count', '<', 'quota');
+            })
+            ->latest()
+            ->get();
+
+        return view('frontend.storefront-home', compact('newProducts', 'saleProducts', 'activePromos', 'popupPromos'));
     }
 
     /** Halaman katalog/shop */

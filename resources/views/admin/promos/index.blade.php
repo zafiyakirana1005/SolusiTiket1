@@ -1,5 +1,5 @@
 @extends('admin.layouts.app')
-@section('title', 'Promo & Campaign')
+@section('title', 'Promo & Popup')
 
 @section('content')
 @php use App\Support\Format; @endphp
@@ -9,10 +9,10 @@
     <nav class="flex items-center gap-1.5 font-label-sm text-label-sm text-outline">
       <a href="{{ route('admin.dashboard') }}" class="hover:text-primary">Beranda</a>
       <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-      <span class="text-on-surface font-medium">Promo &amp; Campaign</span>
+      <span class="text-on-surface font-medium">Promo &amp; Popup</span>
     </nav>
-    <h1 class="font-headline-lg text-headline-lg text-primary tracking-tight mt-1">Promo &amp; Campaign</h1>
-    <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Kelola diskon, kode voucher, dan campaign promosi untuk toko online The Lodge Maribaya.</p>
+    <h1 class="font-headline-lg text-headline-lg text-primary tracking-tight mt-1">Promo &amp; Popup</h1>
+    <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Kelola diskon, kode voucher, dan popup promosi di halaman awal toko online The Lodge Maribaya.</p>
   </div>
   <div class="flex items-center gap-unit-sm shrink-0">
     <a href="{{ route('admin.promos.create') }}" class="h-10 px-unit-lg rounded-lg bg-primary-container text-on-primary hover:bg-primary transition-all shadow-md flex items-center gap-unit-xs font-label-lg text-label-lg font-semibold">
@@ -57,7 +57,7 @@
 <!-- Table -->
 <div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
   <div class="overflow-x-auto">
-    <table class="w-full text-left border-collapse min-w-[980px]">
+    <table class="w-full text-left border-collapse min-w-[1100px]">
       <thead>
         <tr class="bg-surface-container-low h-11 text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">
           <th class="px-unit-sm py-2">Nama Promo</th>
@@ -66,6 +66,7 @@
           <th class="px-unit-sm py-2">Min. Belanja</th>
           <th class="px-unit-sm py-2">Periode</th>
           <th class="px-unit-sm py-2">Kuota</th>
+          <th class="px-unit-sm py-2">Popup Beranda</th>
           <th class="px-unit-sm py-2 text-center">Status</th>
           <th class="px-unit-md py-2 text-right">Aksi</th>
         </tr>
@@ -100,6 +101,11 @@
             {{ Format::tanggal($promo->starts_at) }} <br> s/d {{ Format::tanggal($promo->ends_at) }}
           </td>
           <td class="px-unit-sm py-3 whitespace-nowrap font-body-sm text-body-sm text-on-surface-variant">{{ $promo->quotaLabel() }}</td>
+          <td class="px-unit-sm py-3 whitespace-nowrap">
+            <span class="inline-flex px-2.5 py-1 rounded-full font-label-sm text-label-sm font-semibold {{ $promo->popup_enabled ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container text-on-surface-variant' }}">
+              {{ $promo->popup_enabled ? 'Ya' : 'Tidak' }}
+            </span>
+          </td>
           <td class="px-unit-sm py-3 text-center whitespace-nowrap">
             @php
               $badgeClass = match($status) {
@@ -132,7 +138,7 @@
           </td>
         </tr>
         @empty
-        <tr><td colspan="8" class="py-8 text-center text-on-surface-variant">Belum ada promo. Klik "Buat Promo Baru" untuk mulai.</td></tr>
+        <tr><td colspan="9" class="py-8 text-center text-on-surface-variant">Belum ada promo. Klik "Buat Promo Baru" untuk mulai.</td></tr>
         @endforelse
       </tbody>
     </table>
